@@ -12,8 +12,6 @@ class Task extends Eloquent
     
     protected $connection = 'mongodb';
     protected $collection = 'project_tasks';
-    protected $fillable = ['name', 'description', 'secure_token'];
+    protected $fillable = ['name', 'description'];
     protected $dates = ['deleted_at'];
-    protected $guarded = [];
-    protected string|null $secure_token;
 }
