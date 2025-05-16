@@ -94,9 +94,10 @@ class TaskController extends Controller
 
         $task = $this->taskModel->create([
             'name' => $request->name,
-            'description' => $request->description,
-            'secure_token' => (string) Str::uuid(),
+            'description' => $request->description
         ]);
+        $task->secure_token = (string) Str::uuid();
+        $task->save();
 
         return response()->json(['message' => 'Task created', 'task' => $task], 201);
     }

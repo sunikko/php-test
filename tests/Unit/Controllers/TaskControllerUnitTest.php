@@ -70,32 +70,28 @@ class TaskControllerUnitTest extends TestCase
         $expectedName = 'New Task';
         $expectedDescription = 'This is a new task description';
         $expectedToken = 'token123';
+        $expectedToken = (string) Str::uuid();
 
-        // Prepare mock request data
-        $requestData = [
-            'name' => $expectedName,
-            'description' => $expectedDescription,
-        ];
+        $createdTask = Mockery::mock(Task::class)->makePartial();
+        $createdTask->name = $expectedName;
+        $createdTask->description = $expectedDescription;
+        $createdTask->secure_token = $expectedToken;
+        $createdTask->shouldReceive('save')->once();
 
-        // Prepare a fake Task object to be returned from create()
-        $createdTask = (object) array_merge($requestData, [
-            'secure_token' => $expectedToken,
-        ]);
-
-        // Mock the Task model
         $taskMock = Mockery::mock(Task::class);
         $taskMock->shouldReceive('create')
-                ->once()
-                ->with(Mockery::on(function ($arg) use ($requestData) {
-                    return $arg['name'] === $requestData['name']
-                            && $arg['description'] === $requestData['description']
-                            && isset($arg['secure_token']);
-                }))
-                ->andReturn($createdTask);
+            ->once()
+            ->with(Mockery::on(function ($arg) use ($expectedName, $expectedDescription) {
+                return $arg['name'] === $expectedName
+                    && $arg['description'] === $expectedDescription;
+            }))
+            ->andReturn($createdTask);
 
-        // Create a mock request with input data
         $request = new \Illuminate\Http\Request();
-        $request->replace($requestData);
+        $request->replace([
+            'name' => $expectedName,
+            'description' => $expectedDescription,
+        ]);
 
         // Instantiate controller with mock model
         $controller = new TaskController($taskMock);
